@@ -21,9 +21,11 @@ public class Handler2 {
     private Socket mySocket;
     private String username;
     public static Vector<Handler2> clientsVector = new Vector<Handler2>();
+    private Handler2 myHandler;
   
     public Handler2(Socket s) {
         mySocket = s;
+        myHandler = this;
         try {
             dis = new DataInputStream(s.getInputStream());
             ps = new PrintStream(s.getOutputStream());
@@ -31,29 +33,40 @@ public class Handler2 {
         } catch (IOException ex) {
             Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
         }
-                  
-                    try {
-                            if(dis.readLine().length()!=0){
-                            JSONObject js = new JSONObject(dis.readLine());
-                             username = (String) js.get("username");
-                                System.out.println("usrname"+username);
+            new Thread(){
+            @Override
+            public void run() {
+                while(true){
+                     try {
+                         String res = null;
+                         res = dis.readLine();
+                         if(!(res.equals("getusers"))){
+                            JSONObject js = new JSONObject(res);
+                            username = (String) js.get("username");
+                            System.out.println("usrname"+username);
                              ps.println("true");
+                             Handler2.clientsVector.add(myHandler);
                             //String password = (String) js.get("password");
-                            }
+                         }
+                         else if(res.equals("getusers")){
+                             String str = new String();
+                             for(Handler2 h:clientsVector){
+                                 if(!(h.username.equals(username))){
+                                 str += h.username+"*";
+                                     System.out.println("users"+str);
+                             }
+                             }
+                             ps.println(str);
+                         }
+                            
                        } catch (JSONException ex) {
                             Logger.getLogger(Handler2.class.getName()).log(Level.SEVERE, null, ex);
                         }
                        catch (IOException ex) {
                         Logger.getLogger(Handler2.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    
-             Handler2.clientsVector.add(this);
-             /*String str = new String();
-             for(Handler2 h:clientsVector){
-                 if(!(h.username.equals(username))){
-                     str = (str+h.username+"\\*");
-                 }
-             }
-             ps.println(str);*/
+                    }        
+              }
+            }
+                }.start();       
     }
 }
