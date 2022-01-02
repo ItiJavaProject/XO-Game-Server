@@ -62,18 +62,17 @@ public class MainServer extends AnchorPane {
         getChildren().add(btnStop);
         getChildren().add(btnStart);
         try {
-            mySocket = new ServerSocket(5005);
+            mySocket = new ServerSocket(7001);
             socket = new Socket();
             new Thread() {
                 public void run() {
                     while (true) {
                         try {
                             socket = mySocket.accept();
-                            new Handler(socket);
+                            new Handler2(socket);
                         } catch (IOException ex) {
                             Logger.getLogger(MainServer.class.getName()).log(Level.SEVERE, null, ex);
                         }
-
                     }
                 }
             }.start();
@@ -81,6 +80,5 @@ public class MainServer extends AnchorPane {
         } catch (IOException ex) {
             Logger.getLogger(MainServer.class.getName()).log(Level.SEVERE, null, ex);
         }
-
     }
 }
