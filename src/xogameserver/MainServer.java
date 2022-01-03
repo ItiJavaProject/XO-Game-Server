@@ -5,6 +5,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -18,10 +20,14 @@ public class MainServer extends AnchorPane {
     protected final Button btnStart;
     public ServerSocket mySocket;
     public Socket socket;
+    
+
 
     public MainServer() {
 
         lstOnlineUsers = new ListView();
+
+
         label = new Label();
         btnStop = new Button();
         btnStart = new Button();
@@ -34,6 +40,25 @@ public class MainServer extends AnchorPane {
         lstOnlineUsers.setLayoutY(57.0);
         lstOnlineUsers.setPrefHeight(395.0);
         lstOnlineUsers.setPrefWidth(215.0);
+        
+        new Thread(){
+            @Override
+            public void run() {
+                while(true){
+                    ObservableList<String> listUsersOnline = FXCollections.observableArrayList();
+                    for(Handler2 h:Handler2.clientsVector){
+                        listUsersOnline.add(h.getUsername());
+                    }
+                     lstOnlineUsers.setItems(listUsersOnline);
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(MainServer.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }   
+                }
+           
+        }.start();
 
         label.setAlignment(javafx.geometry.Pos.CENTER);
         label.setContentDisplay(javafx.scene.control.ContentDisplay.CENTER);

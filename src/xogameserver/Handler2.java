@@ -53,10 +53,21 @@ public class Handler2 {
                              for(Handler2 h:clientsVector){
                                  if(!(h.username.equals(username))){
                                  str += h.username+"*";
-                                     System.out.println("users"+str);
+                                 System.out.println( username+" users"+str);
                              }
                              }
-                             ps.println(str);
+                            ps.println(str);
+                         }
+                         
+                         else if(res.equals("request")){
+                             res = dis.readLine();
+                             for(Handler2 h:clientsVector){
+                                 if((h.username.equals(res))){
+                                    h.ps.println(username);
+                                    res = h.dis.readLine();
+                             }
+                             }
+                               ps.println(res);
                          }
                             
                        } catch (JSONException ex) {
@@ -67,6 +78,10 @@ public class Handler2 {
                     }        
               }
             }
-                }.start();       
+      }.start();       
+    }
+    
+    public String getUsername(){
+        return username;
     }
 }
