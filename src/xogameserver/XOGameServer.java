@@ -24,6 +24,12 @@ public class XOGameServer extends Application {
         stage.show();
     }
 
+    @Override
+    public void stop() throws Exception {
+       System.exit(0);
+    }
+    
+
     
     
     

@@ -33,55 +33,111 @@ public class Handler2 {
         } catch (IOException ex) {
             Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        
+         String res = null;
+        try {
+            res = dis.readLine();
+             if(!(res.equals("getusers"))){
+                            JSONObject js = new JSONObject(res);
+                            username = (String) js.get("username");
+                            
+                             ps.println("true");
+                             Handler2.clientsVector.add(myHandler);
+                           
+                         }
+        
+            
+            
+            
+        } catch (IOException ex) {
+            Logger.getLogger(Handler2.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (JSONException ex) {
+            Logger.getLogger(Handler2.class.getName()).log(Level.SEVERE, null, ex);
+        }
+                        
+        
+       
+        
+        
+        
+        
+        
             new Thread(){
             @Override
             public void run() {
                 while(true){
                      try {
                          String res = null;
+                        
                          res = dis.readLine();
-                         if(!(res.equals("getusers"))){
-                            JSONObject js = new JSONObject(res);
-                            username = (String) js.get("username");
-                            System.out.println("usrname"+username);
-                             ps.println("true");
-                             Handler2.clientsVector.add(myHandler);
-                            //String password = (String) js.get("password");
-                         }
-                         else if(res.equals("getusers")){
-                             String str = new String();
-                             for(Handler2 h:clientsVector){
-                                 if(!(h.username.equals(username))){
-                                 str += h.username+"*";
-                                 System.out.println( username+" users"+str);
-                             }
-                             }
-                            ps.println(str);
-                         }
+                         JSONObject js = new JSONObject(res);
                          
-                         else if(res.equals("request")){
-                             res = dis.readLine();
+                         if(js.get("header").equals("request")){
+                            res = (String) js.get("username");
                              for(Handler2 h:clientsVector){
                                  if((h.username.equals(res))){
-                                    h.ps.println(username);
-                                    res = h.dis.readLine();
+                                    js = new JSONObject();
+                                    js.put("header","request");
+                                    js.put("username",username);
+                                    h.ps.println(js.toString());
                              }
                              }
-                               ps.println(res);
+                           
                          }
-                            
-                       } catch (JSONException ex) {
-                            Logger.getLogger(Handler2.class.getName()).log(Level.SEVERE, null, ex);
-                        }
+                         
+                       } 
                        catch (IOException ex) {
                         Logger.getLogger(Handler2.class.getName()).log(Level.SEVERE, null, ex);
-                    }        
+                    } catch (JSONException ex) {
+                        Logger.getLogger(Handler2.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                     
+                      try {
+                        sleep(1000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Handler2.class.getName()).log(Level.SEVERE, null, ex);
+                    }
               }
             }
       }.start();       
-    }
     
-    public String getUsername(){
+    
+    
+
+        new Thread() {
+            @Override
+            public void run() {
+              while(true) {
+                    String str = new String();
+                    for (Handler2 h : clientsVector) {
+                        if (!(h.username.equals(username))) {
+                            str += h.username + "*";
+                        }
+                    }
+                    JSONObject js = new JSONObject();
+                    try {
+                        js.put("header", "usersList");
+                        js.put("list", str);
+                        ps.println(js.toString());
+                    } catch (JSONException ex) {
+                        Logger.getLogger(Handler2.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+
+                    try {
+                        sleep(500);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Handler2.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+
+                }
+            }
+            
+
+        }.start();
+    }
+
+    public String getUsername() {
         return username;
     }
 }

@@ -5,6 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
@@ -14,7 +15,7 @@ import javafx.scene.layout.AnchorPane;
 
 public class MainServer extends AnchorPane {
 
-    protected final ListView lstOnlineUsers;
+    public  ListView lstOnlineUsers;
     protected final Label label;
     protected final Button btnStop;
     protected final Button btnStart;
@@ -48,8 +49,13 @@ public class MainServer extends AnchorPane {
                     ObservableList<String> listUsersOnline = FXCollections.observableArrayList();
                     for(Handler2 h:Handler2.clientsVector){
                         listUsersOnline.add(h.getUsername());
+                        
                     }
-                     lstOnlineUsers.setItems(listUsersOnline);
+                    Platform.runLater(() -> {
+                          lstOnlineUsers.setItems(listUsersOnline);
+                    });
+                      
+                          
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException ex) {
