@@ -1,0 +1,63 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package DataBase;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import org.apache.derby.jdbc.ClientDriver;
+
+
+public class DataAccessLayer {
+   private static Connection conection;
+   public static void connect() throws SQLException
+   {
+           DriverManager.registerDriver (new ClientDriver());
+           conection=DriverManager.getConnection("jdbc:derby://localhost:1527/XOgame","root","root");
+ 
+   }
+   public static void insertIntoDataBase(PlayerModel player) throws SQLException{
+    PreparedStatement stmt = conection.prepareStatement("insert into PLAYER (USERNAME,NAME,EMAIL,PASSWORD,SCORE) Values(?,?,?,?,?)");
+    stmt.setString(1,player.getUserName());
+    stmt.setString(2,player.getName());
+    stmt.setString(3,player.getEmail());
+    stmt.setString(4,player.getPassword());
+    stmt.setInt(5, player.getScore());
+    stmt.executeUpdate();
+   }
+   
+     public static boolean CheckUser(String userName) throws SQLException{
+          PreparedStatement stmt = conection.prepareStatement("select * from PLAYER where USERNAME = ? ");
+          stmt.setString(1,userName);
+          ResultSet rs = stmt.executeQuery();
+          boolean result=false;
+          if(rs!=null){
+              result=true;
+          } 
+       return result;
+   }
+     
+     
+    public static boolean UserLogin(String userName, String Password) throws SQLException{
+    
+     PreparedStatement stmt = conection.prepareStatement("select * from PLAYER where USERNAME = ? ");
+          stmt.setString(1,userName);
+          ResultSet rs = stmt.executeQuery();
+           boolean result=false;
+          if(rs!=null){
+              if(rs.getString("PASSWORD").equals(Password)){
+                   result=true;
+              }
+          } 
+    return result;
+    }  
+     
+     
+   
+   
+}

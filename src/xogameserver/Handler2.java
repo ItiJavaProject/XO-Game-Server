@@ -1,5 +1,6 @@
 package xogameserver;
 
+import DataBase.DataAccessLayer;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -7,6 +8,7 @@ import static java.lang.Thread.sleep;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.sql.SQLException;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,32 +38,37 @@ public class Handler2 {
         
         
          String res = null;
-        try {
-            res = dis.readLine();
-             if(!(res.equals("getusers"))){
-                            JSONObject js = new JSONObject(res);
-                            username = (String) js.get("username");
-                            
-                             ps.println("true");
-                             Handler2.clientsVector.add(myHandler);
-                           
-                         }
-        
-            
-            
-            
-        } catch (IOException ex) {
-            Logger.getLogger(Handler2.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (JSONException ex) {
-            Logger.getLogger(Handler2.class.getName()).log(Level.SEVERE, null, ex);
+         boolean flag =false;
+         while(!flag){
+            try {
+                System.out.println("from while");
+                res = dis.readLine();
+                if (!(res.equals("getusers"))) {
+                    JSONObject js = new JSONObject(res);
+                    username = (String) js.get("username");
+                    flag=DataAccessLayer.UserLogin(username, (String) js.get("password"));         
+                    if(flag){
+                    ps.println("true");
+                    Handler2.clientsVector.add(myHandler);
+                    }
+                    else{
+                     ps.println("false");
+                    }
+
+                }
+
+            } catch (IOException ex) {
+                Logger.getLogger(Handler2.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (JSONException ex) {
+                Logger.getLogger(Handler2.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SQLException ex) {
+                Logger.getLogger(Handler2.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
+        
                         
         
-       
-        
-        
-        
-        
+
         
             new Thread(){
             @Override

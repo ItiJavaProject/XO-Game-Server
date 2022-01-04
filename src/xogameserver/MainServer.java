@@ -1,8 +1,10 @@
 package xogameserver;
 
+import DataBase.DataAccessLayer;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
@@ -25,6 +27,12 @@ public class MainServer extends AnchorPane {
 
 
     public MainServer() {
+        try {
+            DataAccessLayer.connect();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            Logger.getLogger(MainServer.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         lstOnlineUsers = new ListView();
 
