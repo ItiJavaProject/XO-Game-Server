@@ -10,6 +10,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.derby.jdbc.ClientDriver;
 
 
@@ -36,26 +38,32 @@ public class DataAccessLayer {
           stmt.setString(1,userName);
           ResultSet rs = stmt.executeQuery();
           boolean result=false;
-          if(rs!=null){
+          if(rs.next()){
               result=true;
           } 
        return result;
    }
      
      
-    public static boolean UserLogin(String userName, String Password) throws SQLException{
+    public static boolean UserLogin(String userName, String Password) {
     
-     PreparedStatement stmt = conection.prepareStatement("select * from PLAYER where USERNAME = ? ");
-          stmt.setString(1,userName);
-          ResultSet rs = stmt.executeQuery();
-           boolean result=false;
-          if(rs!=null){
-              if(rs.getString("PASSWORD").equals(Password)){
+        boolean result=false;
+       try {
+           PreparedStatement stmt = conection.prepareStatement("select * from PLAYER where USERNAME = ? ");
+           stmt.setString(1,userName);
+           ResultSet rs = stmt.executeQuery();
+           
+           if(rs.next()){
+               if(rs.getString("PASSWORD").equals(Password)){
                    result=true;
-              }
-          } 
-    return result;
-    }  
+               }
+           }
+           
+       } catch (SQLException ex) {
+          result = false;
+       }
+       return result;
+    }
      
      
    

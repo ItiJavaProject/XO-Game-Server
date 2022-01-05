@@ -7,6 +7,12 @@ package DataBase;
 
 
 public class PlayerModel {
+   
+    private String userName;
+    private String email;
+    private String name;
+    private int score;
+    private String password;
 
     public PlayerModel(String userName, String email, String name, int score, String password) {
         this.userName = userName;
@@ -55,11 +61,7 @@ public class PlayerModel {
     public void setPassword(String password) {
         this.password = password;
     }
-    String userName;
-    String email;
-    String name;
-    int score;
-    String password;
+   
     
     
     

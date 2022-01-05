@@ -24,7 +24,7 @@ public class Handler2 {
     private String username;
     public static Vector<Handler2> clientsVector = new Vector<Handler2>();
     private Handler2 myHandler;
-  
+
     public Handler2(Socket s) {
         mySocket = s;
         myHandler = this;
@@ -35,26 +35,30 @@ public class Handler2 {
         } catch (IOException ex) {
             Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        
-         String res = null;
-         boolean flag =false;
-         while(!flag){
+
+        String res = null;
+        boolean flag = false;
+        while (!flag) {
             try {
-                System.out.println("from while");
+                boolean f = true;
                 res = dis.readLine();
-                if (!(res.equals("getusers"))) {
-                    JSONObject js = new JSONObject(res);
-                    username = (String) js.get("username");
-                    flag=DataAccessLayer.UserLogin(username, (String) js.get("password"));         
-                    if(flag){
+
+                JSONObject js = new JSONObject(res);
+                username = (String) js.get("username");
+                for (Handler2 h : clientsVector) {
+                    if (h.username.equals(username)) {
+                        f = false;
+                    }
+                }
+
+                if (f && DataAccessLayer.CheckUser(username)) {
+                    flag = DataAccessLayer.UserLogin(username, (String) js.get("password"));
+                }
+                if (flag) {
                     ps.println("true");
                     Handler2.clientsVector.add(myHandler);
-                    }
-                    else{
-                     ps.println("false");
-                    }
-
+                } else {
+                    ps.println("false");
                 }
 
             } catch (IOException ex) {
@@ -65,57 +69,49 @@ public class Handler2 {
                 Logger.getLogger(Handler2.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
-                        
-        
-
-        
-            new Thread(){
-            @Override
-            public void run() {
-                while(true){
-                     try {
-                         String res = null;
-                        
-                         res = dis.readLine();
-                         JSONObject js = new JSONObject(res);
-                         
-                         if(js.get("header").equals("request")){
-                            res = (String) js.get("username");
-                             for(Handler2 h:clientsVector){
-                                 if((h.username.equals(res))){
-                                    js = new JSONObject();
-                                    js.put("header","request");
-                                    js.put("username",username);
-                                    h.ps.println(js.toString());
-                             }
-                             }
-                           
-                         }
-                         
-                       } 
-                       catch (IOException ex) {
-                        Logger.getLogger(Handler2.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (JSONException ex) {
-                        Logger.getLogger(Handler2.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                     
-                      try {
-                        sleep(1000);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(Handler2.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-              }
-            }
-      }.start();       
-    
-    
-    
 
         new Thread() {
             @Override
             public void run() {
-              while(true) {
+                while (true) {
+                    try {
+                        String res = null;
+
+                        res = dis.readLine();
+                        JSONObject js = new JSONObject(res);
+
+                        if (js.get("header").equals("request")) {
+                            res = (String) js.get("username");
+                            for (Handler2 h : clientsVector) {
+                                if ((h.username.equals(res))) {
+                                    js = new JSONObject();
+                                    js.put("header", "request");
+                                    js.put("username", username);
+                                    h.ps.println(js.toString());
+                                }
+                            }
+
+                        }
+
+                    } catch (IOException ex) {
+                        Logger.getLogger(Handler2.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (JSONException ex) {
+                        Logger.getLogger(Handler2.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+
+                    try {
+                        sleep(1000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Handler2.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }.start();
+
+        new Thread() {
+            @Override
+            public void run() {
+                while (true) {
                     String str = new String();
                     for (Handler2 h : clientsVector) {
                         if (!(h.username.equals(username))) {
@@ -139,7 +135,6 @@ public class Handler2 {
 
                 }
             }
-            
 
         }.start();
     }
