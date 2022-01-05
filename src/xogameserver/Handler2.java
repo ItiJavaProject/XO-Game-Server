@@ -1,6 +1,7 @@
 package xogameserver;
 
 import DataBase.DataAccessLayer;
+import DataBase.PlayerModel;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -24,10 +25,12 @@ public class Handler2 {
     private String username;
     public static Vector<Handler2> clientsVector = new Vector<Handler2>();
     private Handler2 myHandler;
+    PlayerModel player;
 
     public Handler2(Socket s) {
         mySocket = s;
         myHandler = this;
+        player= new PlayerModel();
         try {
             dis = new DataInputStream(s.getInputStream());
             ps = new PrintStream(s.getOutputStream());
@@ -44,6 +47,7 @@ public class Handler2 {
                 res = dis.readLine();
 
                 JSONObject js = new JSONObject(res);
+                String header =(String) js.get("header");
                 username = (String) js.get("username");
                 for (Handler2 h : clientsVector) {
                     if (h.username.equals(username)) {
@@ -51,7 +55,10 @@ public class Handler2 {
                     }
                 }
 
-                if (f && DataAccessLayer.CheckUser(username)) {
+              if(header.equals("login")){
+                  player.setUserName(username);
+             
+              if (f && DataAccessLayer.CheckUser(username)) {
                     flag = DataAccessLayer.UserLogin(username, (String) js.get("password"));
                 }
                 if (flag) {
@@ -60,6 +67,25 @@ public class Handler2 {
                 } else {
                     ps.println("false");
                 }
+              }
+              else if(header.equals("register")){
+                  player.setUserName(username);
+                  player.setPassword((String) js.get("password"));
+                  player.setEmail((String) js.get("email"));
+                  player.setName((String) js.get("name"));
+                  player.setScore(0);
+                  if(DataAccessLayer.CheckUser(username)){
+                    ps.println("false");
+                  }
+                  else{
+                  DataAccessLayer.registerInsertMethod(player);
+                    flag=true;
+                     ps.println("true");
+                  }
+                  
+                   
+
+              }
 
             } catch (IOException ex) {
                 Logger.getLogger(Handler2.class.getName()).log(Level.SEVERE, null, ex);

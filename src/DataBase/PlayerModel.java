@@ -13,6 +13,7 @@ public class PlayerModel {
     private String name;
     private int score;
     private String password;
+    public PlayerModel(){}
 
     public PlayerModel(String userName, String email, String name, int score, String password) {
         this.userName = userName;
