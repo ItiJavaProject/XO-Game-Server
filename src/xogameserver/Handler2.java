@@ -79,6 +79,7 @@ public class Handler2 {
                   }
                   else{
                   DataAccessLayer.registerInsertMethod(player);
+                  Handler2.clientsVector.add(myHandler);
                     flag=true;
                      ps.println("true");
                   }
