@@ -2,8 +2,10 @@ package xogameserver;
 
 import DataBase.DataAccessLayer;
 import java.io.IOException;
+import java.net.Inet4Address;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,10 +19,12 @@ import javafx.scene.layout.AnchorPane;
 
 public class MainServer extends AnchorPane {
 
-    public  ListView lstOnlineUsers;
-    protected final Label label;
-    protected final Button btnStop;
-    protected final Button btnStart;
+  
+     protected  ListView lstOnlineUsers;
+    protected  Label label;
+    protected  Button btnStart;
+    protected final Label lbIp;
+    protected  Label lbIpAdd;
     public ServerSocket mySocket;
     public Socket socket;
     
@@ -35,11 +39,10 @@ public class MainServer extends AnchorPane {
         }
 
         lstOnlineUsers = new ListView();
-
-
-        label = new Label();
-        btnStop = new Button();
+         label = new Label();
         btnStart = new Button();
+        lbIp = new Label();
+        lbIpAdd = new Label();
 
         setId("AnchorPane");
         setPrefHeight(476.0);
@@ -49,13 +52,55 @@ public class MainServer extends AnchorPane {
         lstOnlineUsers.setLayoutY(57.0);
         lstOnlineUsers.setPrefHeight(395.0);
         lstOnlineUsers.setPrefWidth(215.0);
+
+        label.setAlignment(javafx.geometry.Pos.CENTER);
+        label.setContentDisplay(javafx.scene.control.ContentDisplay.CENTER);
+        label.setLayoutX(389.0);
+        label.setLayoutY(20.0);
+        label.setPrefHeight(27.0);
+        label.setPrefWidth(215.0);
+        label.setText("Online Users");
+
+        btnStart.setLayoutX(177.0);
+        btnStart.setLayoutY(269.0);
+        btnStart.setMnemonicParsing(false);
+        btnStart.setPrefHeight(39.0);
+        btnStart.setPrefWidth(122.0);
+        btnStart.setText("Start Services");
+
+        lbIp.setAlignment(javafx.geometry.Pos.CENTER);
+        lbIp.setLayoutX(186.0);
+        lbIp.setLayoutY(115.0);
+        lbIp.setPrefHeight(17.0);
+        lbIp.setPrefWidth(74.0);
+        lbIp.setText("Ip Address");
+
+        lbIpAdd.setAlignment(javafx.geometry.Pos.CENTER);
+        lbIpAdd.setLayoutX(145.0);
+        lbIpAdd.setLayoutY(148.0);
+        lbIpAdd.setPrefHeight(27.0);
+        lbIpAdd.setPrefWidth(162.0);
+        lbIpAdd.setText("0.0.0.0");
+        
+         try {
+             lbIpAdd.setText(Inet4Address.getLocalHost().getHostAddress());
+         } catch (UnknownHostException ex) {
+             Logger.getLogger(MainServer.class.getName()).log(Level.SEVERE, null, ex);
+         }
+
+
+        getChildren().add(lstOnlineUsers);
+        getChildren().add(label);
+        getChildren().add(btnStart);
+        getChildren().add(lbIp);
+        getChildren().add(lbIpAdd);
         
         new Thread(){
             @Override
             public void run() {
                 while(true){
                     ObservableList<String> listUsersOnline = FXCollections.observableArrayList();
-                    for(Handler2 h:Handler2.clientsVector){
+                    for(Handler h:Handler.clientsVector){
                         listUsersOnline.add(h.getUsername());
                         
                     }
@@ -74,32 +119,6 @@ public class MainServer extends AnchorPane {
            
         }.start();
 
-        label.setAlignment(javafx.geometry.Pos.CENTER);
-        label.setContentDisplay(javafx.scene.control.ContentDisplay.CENTER);
-        label.setLayoutX(389.0);
-        label.setLayoutY(20.0);
-        label.setPrefHeight(27.0);
-        label.setPrefWidth(215.0);
-        label.setText("Online Users");
-
-        btnStop.setLayoutX(213.0);
-        btnStop.setLayoutY(342.0);
-        btnStop.setMnemonicParsing(false);
-        btnStop.setPrefHeight(39.0);
-        btnStop.setPrefWidth(122.0);
-        btnStop.setText(" Stop Services");
-
-        btnStart.setLayoutX(37.0);
-        btnStart.setLayoutY(342.0);
-        btnStart.setMnemonicParsing(false);
-        btnStart.setPrefHeight(39.0);
-        btnStart.setPrefWidth(122.0);
-        btnStart.setText("Start Services");
-
-        getChildren().add(lstOnlineUsers);
-        getChildren().add(label);
-        getChildren().add(btnStop);
-        getChildren().add(btnStart);
         try {
             mySocket = new ServerSocket(7001);
             socket = new Socket();
@@ -108,7 +127,7 @@ public class MainServer extends AnchorPane {
                     while (true) {
                         try {
                             socket = mySocket.accept();
-                            new Handler2(socket);
+                            new Handler(socket);
                         } catch (IOException ex) {
                             Logger.getLogger(MainServer.class.getName()).log(Level.SEVERE, null, ex);
                         }

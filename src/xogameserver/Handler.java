@@ -1,115 +1,227 @@
-
 package xogameserver;
 
+import DataBase.DataAccessLayer;
+import DataBase.PlayerModel;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import static java.lang.Thread.sleep;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-class Pair {
-    InetAddress player1;
-    InetAddress player2;  
-}
+import jdk.nashorn.internal.parser.JSONParser;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class Handler {
-    DataInputStream loginData;
-    PrintStream dos;
-    Socket mySocket;
-    static Vector<Handler> clinetsVector=new Vector<Handler>();
-    static Vector <Pair> players= new Vector<>();
-    
-    
+
+    private DataInputStream dis;
+    private PrintStream ps;
+    private Socket mySocket;
+    private String username;
+    private String opponent;
+    public static Vector<Handler> clientsVector = new Vector<Handler>();
+    private Handler myHandler;
+    private PlayerModel player;
+    private JSONObject json ;
+
     public Handler(Socket s) {
-        mySocket=s;
+        mySocket = s;
+        myHandler = this;
+        opponent = null;
+        player= new PlayerModel();
         try {
-            loginData= new DataInputStream(s.getInputStream());
-            dos=new PrintStream(s.getOutputStream());
-            Handler.clinetsVector.add(this);
-            
+            dis = new DataInputStream(s.getInputStream());
+            ps = new PrintStream(s.getOutputStream());
+
         } catch (IOException ex) {
+            Logger.getLogger
+        (Handler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        String res = null;
+        boolean flag = false;
+        while (!flag) {
+            try {
+                //boolean f = true;
+                res = dis.readLine();
+                json = new JSONObject(res);
+                 if (json.get("header").equals("register")) {
+                 flag = requestRegister(json);
+                }
+                else if (json.get("header").equals("login")) {
+                    flag = requestLogin(json);
+                }
+
+                //String header =(String) json.get("header");
+                /*username = (String) json.get("username");
+                for (Handler h : clientsVector) {
+                    if (h.username.equals(username)) {
+                        f = false;
+                    }
+                }*/
+
+              /*if(header.equals("login")){
+                  player.setUserName(username);
+             
+              if (f && DataAccessLayer.CheckUser(username)) {
+                    flag = DataAccessLayer.UserLogin(username, (String) js.get("password"));
+                }
+                if (flag) {
+                    ps.println("true");
+                    Handler.clientsVector.add(myHandler);
+                } else {
+                    ps.println("false");
+                }
+              }*/
+              /*else if(header.equals("register")){
+                  player.setUserName(username);
+                  player.setPassword((String) js.get("password"));
+                  player.setEmail((String) js.get("email"));
+                  player.setName((String) js.get("name"));
+                  player.setScore(0);
+                  if(DataAccessLayer.CheckUser(username)){
+                    ps.println("false");
+                  }
+                  else{
+                  DataAccessLayer.registerInsertMethod(player);
+                  Handler.clientsVector.add(myHandler);
+                    flag=true;
+                     ps.println("true");
+                  }
+                
+              }*/
+
+            } catch (IOException ex) {
+                Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (JSONException ex) {
+                Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
+            } 
+        }
+    }
+     private boolean requestLogin(JSONObject js){
+        try {
+            username = (String) js.get("username");
+            ps.println("true");
+            Handler.clientsVector.add(myHandler);
+            threadUserOnline.start();
+            threadGame.start();
+           
+        } catch (JSONException ex) {
             Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        new Thread(){
-          public void run(){
-       while(true){
-           try {
-               String str= loginData.readLine();
-               String arr[]=str.split("*");
-               
-               if(arr[0].equals("1")){
-                   System.out.println("userName is "+arr[1] +" password "+arr[2]);
-                   //String userName=arr[1];
-                   //String password=arr[2];
-                   //deal with DataBase Class
-                   //if 0 succesfully login
-                   dos.print("0");
-               }
-               else if(arr[0].equals("2")){
-                //deal with DataBase Class
-                // if 0 succesfully rigester
-                dos.print("0");
-               }
-               else if(arr[0].equals("3")){
-                   
-                   Handler player = new Handler(mySocket);
-                   String answer=new String();
-                   for (Handler h :clinetsVector ){
-                   if(h.mySocket.getInetAddress().toString()==arr[1])
-                    {  
-                        player=h;
-                                  
-                    }
-                        
-                    }
-                    // if 4 some one wants to connect you
-                    player.dos.println("4");
-                    for(int z=0; z<5&&answer==null;z++){
-                         answer= player.loginData.readLine();
-                            try {
-                                sleep(1000);
-                                
-                            } catch (InterruptedException ex) {
-                                Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-
-                        }
-                        // if 5 user accespt 
-                    if(answer.equals("5")){
-                        while(true){
-                        String str1= loginData.readLine();
-                        player.dos.println(str);
-                        }
-                   
-                   }
-               
-               
-               }
-               
-              
-              
-           }catch(SocketException e) {
-               try {
-                   loginData.close();
-                   clinetsVector.remove( this);
-               } catch (IOException ex) {
-                   Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
-               }
-           }
-            catch (IOException ex) {
-               Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
-           }
-       }
-   } 
-        }.start();
-
+         return true;
+    }   
+     private boolean requestRegister(JSONObject js){
+        try {
+            username = (String) js.get("username");
+            ps.println("true");
+            Handler.clientsVector.add(myHandler);
+        } catch (JSONException ex) {
+            Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return true;
+          }
+     public String getUsername() {
+        return username;
     }
-    
-    
-    
+     
+     Thread threadUserOnline = new Thread(){
+            @Override
+            public void run() {
+                while(true){
+                try {
+                    System.out.println("hello thread UserOnline");
+                    ArrayList<String> list = new ArrayList<String>();
+                    json = new JSONObject();
+                    for(Handler h:clientsVector){
+                       if (!(h.username.equals(username)) && h.opponent == null ){
+                            list.add(h.username);
+                        } 
+                        JSONArray jsonArr = new JSONArray(list);
+                        json.put("header","getOnlineUsers");
+                        json.put("listUsersOnline",jsonArr);
+                        ps.println(json.toString());
+                    }
+                    
+                } catch (JSONException ex) {
+                    Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                try {
+                      sleep(500);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+            }
+            }
+        };
+     Thread threadGame = new Thread(){
+            @Override
+            public void run() {    
+               while(true){
+                try {
+                     System.out.println("hello thread game");
+                    String res = dis.readLine();
+                    json = new JSONObject(res);
+                    if(json.get("header").equals("request")){
+                    for(Handler h:clientsVector){
+                        if((h.username.equals(json.get("username")))&& h.opponent == null){
+                            json = new JSONObject();
+                            json.put("header","request");
+                            json.put("username",username);
+                            h.ps.println(json.toString());
+                        }
+                    }
+                    }
+                    
+                    else if (json.get("header").equals("requestConfirm")) {
+                             for (Handler h : clientsVector) {
+                                if ((h.username.equals(json.get("username")))) {
+                                    JSONObject js1 = new JSONObject();
+                                    js1.put("header", "requestConfirm");
+                                    js1.put("username", username);
+                                    js1.put("res", (String) json.get("res"));
+                                    if(json.get("res").equals("yes")){
+                                        opponent = h.username;
+                                        h.opponent = username;
+                                    }
+                                    h.ps.println(js1.toString());
+                                }
+                            }
+                        }
+                    else if(json.get("header").equals("move")) {
+                             for (Handler h : clientsVector) {
+                                if ((h.username.equals(opponent))) {
+                                    h.ps.println(json.toString());
+                                }
+                            }
+                        
+                        }
+                } catch (IOException ex) {
+                    try {
+                            dis.close();
+                            ps.close();
+                            mySocket.close();
+                            clientsVector.remove(myHandler);
+                        } catch (IOException ex1) {
+                        Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex1);
+                    }
+                } catch (JSONException ex) {
+                    Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                try {
+                        sleep(500);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }          
+         };
+
 }
