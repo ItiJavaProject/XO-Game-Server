@@ -19,7 +19,6 @@ import javafx.scene.layout.AnchorPane;
 
 public class MainServer extends AnchorPane {
 
-  
      protected  ListView lstOnlineUsers;
     protected  Label label;
     protected  Button btnStart;
@@ -28,7 +27,6 @@ public class MainServer extends AnchorPane {
     public ServerSocket mySocket;
     public Socket socket;
     
-
 
     public MainServer() {
         try {

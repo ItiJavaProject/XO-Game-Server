@@ -30,6 +30,7 @@ public class Handler {
     private Handler myHandler;
     private PlayerModel player;
     private JSONObject json ;
+ 
 
     public Handler(Socket s) {
         mySocket = s;
@@ -44,12 +45,12 @@ public class Handler {
             Logger.getLogger
         (Handler.class.getName()).log(Level.SEVERE, null, ex);
         }
-
         String res = null;
-        boolean flag = false;
+         boolean flag = false;
+
+
         while (!flag) {
             try {
-                //boolean f = true;
                 res = dis.readLine();
                 json = new JSONObject(res);
                  if (json.get("header").equals("register")) {
@@ -59,28 +60,7 @@ public class Handler {
                     flag = requestLogin(json);
                 }
 
-                //String header =(String) json.get("header");
-                /*username = (String) json.get("username");
-                for (Handler h : clientsVector) {
-                    if (h.username.equals(username)) {
-                        f = false;
-                    }
-                }*/
-
-              /*if(header.equals("login")){
-                  player.setUserName(username);
-             
-              if (f && DataAccessLayer.CheckUser(username)) {
-                    flag = DataAccessLayer.UserLogin(username, (String) js.get("password"));
-                }
-                if (flag) {
-                    ps.println("true");
-                    Handler.clientsVector.add(myHandler);
-                } else {
-                    ps.println("false");
-                }
-              }*/
-              /*else if(header.equals("register")){
+             /*else if(header.equals("register")){
                   player.setUserName(username);
                   player.setPassword((String) js.get("password"));
                   player.setEmail((String) js.get("email"));
@@ -106,17 +86,30 @@ public class Handler {
         }
     }
      private boolean requestLogin(JSONObject js){
+         boolean notLogedBefore = true;
+        boolean resLogin = true;
         try {
+            /*for (Handler h : clientsVector) {
+                    if (h.username.equals(username)) {
+                        notLogedBefore = false;
+                    }
+                }*/
             username = (String) js.get("username");
-            ps.println("true");
-            Handler.clientsVector.add(myHandler);
-            threadUserOnline.start();
-            threadGame.start();
+            /*if (notLogedBefore && DataAccessLayer.UserLogin(username, (String) js.get("password"))){
+                resLogin = true;
+                 Handler.clientsVector.add(myHandler);
+                threadUserOnline.start();
+                threadGame.start();
+                }*/
+             Handler.clientsVector.add(myHandler);
+                threadUserOnline.start();
+                threadGame.start();
+             ps.println(String.valueOf(resLogin));
            
         } catch (JSONException ex) {
             Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
-        }
-         return true;
+        } 
+         return resLogin;
     }   
      private boolean requestRegister(JSONObject js){
         try {

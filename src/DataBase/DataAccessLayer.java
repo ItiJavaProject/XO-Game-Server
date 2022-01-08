@@ -21,7 +21,6 @@ public class DataAccessLayer {
    {
            DriverManager.registerDriver (new ClientDriver());
            conection=DriverManager.getConnection("jdbc:derby://localhost:1527/XOgame","root","root");
- 
    }
    public static void registerInsertMethod(PlayerModel player) throws SQLException{
     PreparedStatement stmt = conection.prepareStatement("insert into PLAYER (USERNAME,NAME,EMAIL,PASSWORD,SCORE) Values(?,?,?,?,?)");
@@ -43,20 +42,18 @@ public class DataAccessLayer {
           } 
        return result;
    }
-     
-     
-    public static boolean UserLogin(String userName, String Password) {
+        
+    public static boolean UserLogin(String userName, String password) {
     
         boolean result=false;
        try {
-           PreparedStatement stmt = conection.prepareStatement("select * from PLAYER where USERNAME = ? ");
+           PreparedStatement stmt = conection.prepareStatement("select * from PLAYER where USERNAME = ? and PASSWORD = ?");
            stmt.setString(1,userName);
+           stmt.setString(2,password);
            ResultSet rs = stmt.executeQuery();
            
            if(rs.next()){
-               if(rs.getString("PASSWORD").equals(Password)){
                    result=true;
-               }
            }
            
        } catch (SQLException ex) {
