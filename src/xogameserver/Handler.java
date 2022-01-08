@@ -1,20 +1,15 @@
 package xogameserver;
 
-import DataBase.DataAccessLayer;
 import DataBase.PlayerModel;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import static java.lang.Thread.sleep;
-import java.net.InetAddress;
 import java.net.Socket;
-import java.net.SocketException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jdk.nashorn.internal.parser.JSONParser;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -125,12 +120,21 @@ public class Handler {
         return username;
     }
      
+     public void closeStreams(){
+        try {
+            dis.close();
+            ps.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+     
+     }
+     
      Thread threadUserOnline = new Thread(){
             @Override
             public void run() {
                 while(true){
-                try {
-                    System.out.println("hello thread UserOnline");
+                try {                   
                     ArrayList<String> list = new ArrayList<String>();
                     json = new JSONObject();
                     for(Handler h:clientsVector){
@@ -159,7 +163,7 @@ public class Handler {
             public void run() {    
                while(true){
                 try {
-                     System.out.println("hello thread game");
+                    
                     String res = dis.readLine();
                     json = new JSONObject(res);
                     if(json.get("header").equals("request")){
@@ -188,7 +192,7 @@ public class Handler {
                                 }
                             }
                         }
-                    else if(json.get("header").equals("move")) {
+                    else if(json.get("header").equals("move") || json.get("header").equals("playingChar")) {
                              for (Handler h : clientsVector) {
                                 if ((h.username.equals(opponent))) {
                                     h.ps.println(json.toString());
