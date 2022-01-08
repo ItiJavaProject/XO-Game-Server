@@ -195,9 +195,16 @@ public class Handler {
                     else if(json.get("header").equals("move") || json.get("header").equals("playingChar")) {
                              for (Handler h : clientsVector) {
                                 if ((h.username.equals(opponent))) {
-                                    h.ps.println(json.toString());
+                                    if(json.get("header").equals("move") && (json.getInt("row")==-1 || json.getString("move").equals("full") || json.getString("move").equals("win"))){
+                                       h.opponent = null;
+                                       opponent = null;
+                                    }
+                                     h.ps.println(json.toString());
                                 }
+                               
                             }
+                                                            
+
                         
                         }
                 } catch (IOException ex) {
