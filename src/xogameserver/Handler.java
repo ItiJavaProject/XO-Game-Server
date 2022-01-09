@@ -200,12 +200,8 @@ public class Handler {
                                        opponent = null;
                                     }
                                      h.ps.println(json.toString());
-                                }
-                               
+                                }                               
                             }
-                                                            
-
-                        
                         }
                 } catch (IOException ex) {
                     try {
