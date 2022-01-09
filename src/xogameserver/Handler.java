@@ -23,7 +23,6 @@ public class Handler {
     private String opponent;
     public static Vector<Handler> clientsVector = new Vector<Handler>();
     private Handler myHandler;
-    private PlayerModel player;
     private JSONObject json ;
  
 
@@ -31,7 +30,6 @@ public class Handler {
         mySocket = s;
         myHandler = this;
         opponent = null;
-        player= new PlayerModel();
         try {
             dis = new DataInputStream(s.getInputStream());
             ps = new PrintStream(s.getOutputStream());
@@ -138,6 +136,7 @@ public class Handler {
                     ArrayList<String> list = new ArrayList<String>();
                     json = new JSONObject();
                     for(Handler h:clientsVector){
+                        System.out.println(h.username+" VS "+h.opponent);
                        if (!(h.username.equals(username)) && h.opponent == null ){
                             list.add(h.username);
                         } 
@@ -168,13 +167,15 @@ public class Handler {
                     json = new JSONObject(res);
                     if(json.get("header").equals("request")){
                     for(Handler h:clientsVector){
-                        if((h.username.equals(json.get("username")))&& h.opponent == null){
-                            json = new JSONObject();
-                            json.put("header","request");
-                            json.put("username",username);
-                            h.ps.println(json.toString());
+                            if ((h.username.equals(json.get("username"))) && h.opponent == null) {
+                                JSONObject jsons = new JSONObject();
+                                jsons.put("header", "request");
+                                jsons.put("username", username);
+                                
+                                h.ps.println(jsons.toString());
+                                break;
+                            }
                         }
-                    }
                     }
                     
                     else if (json.get("header").equals("requestConfirm")) {
@@ -195,9 +196,9 @@ public class Handler {
                     else if(json.get("header").equals("move") || json.get("header").equals("playingChar")) {
                              for (Handler h : clientsVector) {
                                 if ((h.username.equals(opponent))) {
-                                    if(json.get("header").equals("move") && (json.getInt("row")==-1 || json.getString("move").equals("full") || json.getString("move").equals("win"))){
-                                       h.opponent = null;
-                                       opponent = null;
+                                    if (json.get("header").equals("move") && (json.getInt("row") == -1 || json.getString("move").equals("full") || json.getString("move").equals("win"))) {
+                                        opponent = null;
+                                        h.opponent = null;
                                     }
                                      h.ps.println(json.toString());
                                 }                               
