@@ -12,9 +12,12 @@ import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 
 public class MainServer extends AnchorPane {
@@ -117,8 +120,8 @@ public class MainServer extends AnchorPane {
            
         }.start();
 
-        try {
-            mySocket = new ServerSocket(7001);
+        //try {
+            //mySocket = new ServerSocket(7001);
             socket = new Socket();
             new Thread() {
                 public void run() {
@@ -133,8 +136,32 @@ public class MainServer extends AnchorPane {
                 }
             }.start();
 
-        } catch (IOException ex) {
+       /* } catch (IOException ex) {
             Logger.getLogger(MainServer.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }*/
+        
+        btnStart.setOnMouseClicked(new EventHandler<MouseEvent>(){
+            @Override
+           public void handle(MouseEvent event)  {
+               String txt= btnStart.getText();
+               if(txt.equals("Start Services")){
+                   try {
+                       mySocket = new ServerSocket(7001);
+                        btnStart.setText("Stop Services");
+                   } catch (IOException ex) {
+                       Logger.getLogger(MainServer.class.getName()).log(Level.SEVERE, null, ex);
+                   }
+               }
+               else if(txt.equals("Stop Services")){
+                   try {
+                       mySocket.close();
+                       btnStart.setText("Start Services");
+                   } catch (IOException ex) {
+                       Logger.getLogger(MainServer.class.getName()).log(Level.SEVERE, null, ex);
+                   }
+                   
+               }
+            }
+        });
     }
 }
