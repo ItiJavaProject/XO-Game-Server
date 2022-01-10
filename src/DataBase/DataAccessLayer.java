@@ -14,11 +14,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.derby.jdbc.ClientDriver;
 
-
+  
 public class DataAccessLayer {
+    int counter;
    private static Connection conection;
    public static void connect() throws SQLException
-   {
+   {        
            DriverManager.registerDriver (new ClientDriver());
            conection=DriverManager.getConnection("jdbc:derby://localhost:1527/XOgame","root","root");
    }
@@ -74,4 +75,16 @@ public class DataAccessLayer {
     }
    
    
+     public static int  getCounte() throws SQLException {
+         int counter=0;
+        PreparedStatement stmt1 = conection.prepareStatement("select USERNAME from PLAYER ");
+    
+        ResultSet rs = stmt1.executeQuery();
+        while(rs.next()){
+            counter++;
+        }
+        return counter;
+       
+    }
+    
 }
