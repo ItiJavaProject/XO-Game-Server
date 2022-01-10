@@ -7,6 +7,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
@@ -96,7 +97,7 @@ public class MainServer extends AnchorPane {
         getChildren().add(lbIp);
         getChildren().add(lbIpAdd);
         
-        new Thread(){
+       /* new Thread(){
             @Override
             public void run() {
                 while(true){
@@ -118,12 +119,17 @@ public class MainServer extends AnchorPane {
                 }   
                 }
            
-        }.start();
+        }.start();*/
 
         //try {
             //mySocket = new ServerSocket(7001);
             socket = new Socket();
-            new Thread() {
+            t.start();
+            onlineUserThread.start();
+            onlineUserThread.suspend();
+            t.suspend();
+            
+            /*new Thread() {
                 public void run() {
                     while (true) {
                         try {
@@ -147,7 +153,11 @@ public class MainServer extends AnchorPane {
                if(txt.equals("Start Services")){
                    try {
                        mySocket = new ServerSocket(7001);
+                       socket=new Socket();
+                        t.resume();
+                        onlineUserThread.resume();
                         btnStart.setText("Stop Services");
+                        Handler.clientsVector=new Vector<Handler>();
                    } catch (IOException ex) {
                        Logger.getLogger(MainServer.class.getName()).log(Level.SEVERE, null, ex);
                    }
@@ -155,6 +165,8 @@ public class MainServer extends AnchorPane {
                else if(txt.equals("Stop Services")){
                    try {
                        mySocket.close();
+                       onlineUserThread.suspend();
+                       t.suspend();
                        btnStart.setText("Start Services");
                    } catch (IOException ex) {
                        Logger.getLogger(MainServer.class.getName()).log(Level.SEVERE, null, ex);
@@ -164,4 +176,40 @@ public class MainServer extends AnchorPane {
             }
         });
     }
+    Thread t= new Thread() {
+                public void run() {
+                    while (true) {
+                        try {
+                            socket = mySocket.accept();
+                            new Handler(socket);
+                        } catch (IOException ex) {
+                            Logger.getLogger(MainServer.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
+            };
+    
+    Thread onlineUserThread= new Thread(){
+            @Override
+            public void run() {
+                while(true){
+                    ObservableList<String> listUsersOnline = FXCollections.observableArrayList();
+                    for(Handler h:Handler.clientsVector){
+                        listUsersOnline.add(h.getUsername());
+                        
+                    }
+                    Platform.runLater(() -> {
+                          lstOnlineUsers.setItems(listUsersOnline);
+                    });
+                      
+                          
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(MainServer.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }   
+                }
+           
+        };
 }

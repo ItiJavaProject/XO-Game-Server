@@ -1,11 +1,13 @@
 package xogameserver;
 
+import DataBase.DataAccessLayer;
 import DataBase.PlayerModel;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import static java.lang.Thread.sleep;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -24,12 +26,14 @@ public class Handler {
     public static Vector<Handler> clientsVector = new Vector<Handler>();
     private Handler myHandler;
     private JSONObject json ;
+    private PlayerModel player ;
  
 
     public Handler(Socket s) {
         mySocket = s;
         myHandler = this;
         opponent = null;
+        player = new PlayerModel();
         try {
             dis = new DataInputStream(s.getInputStream());
             ps = new PrintStream(s.getOutputStream());
@@ -75,6 +79,8 @@ public class Handler {
                 Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
             } catch (JSONException ex) {
                 Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SQLException ex) {
+                Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
             } 
         }
     }
@@ -82,21 +88,21 @@ public class Handler {
          boolean notLogedBefore = true;
         boolean resLogin = true;
         try {
-            /*for (Handler h : clientsVector) {
+            for (Handler h : clientsVector) {
                     if (h.username.equals(username)) {
                         notLogedBefore = false;
                     }
-                }*/
+                }
             username = (String) js.get("username");
-            /*if (notLogedBefore && DataAccessLayer.UserLogin(username, (String) js.get("password"))){
+            if (notLogedBefore && DataAccessLayer.UserLogin(username, (String) js.get("password"))){
                 resLogin = true;
-                 Handler.clientsVector.add(myHandler);
+                Handler.clientsVector.add(myHandler);
                 threadUserOnline.start();
                 threadGame.start();
-                }*/
-             Handler.clientsVector.add(myHandler);
-                threadUserOnline.start();
-                threadGame.start();
+                }
+            else{
+                resLogin = false;
+            }
              ps.println(String.valueOf(resLogin));
            
         } catch (JSONException ex) {
@@ -104,15 +110,29 @@ public class Handler {
         } 
          return resLogin;
     }   
-     private boolean requestRegister(JSONObject js){
+     private boolean requestRegister(JSONObject js) throws SQLException{
+                 boolean resRegister= true;
+
         try {
-            username = (String) js.get("username");
-            ps.println("true");
-            Handler.clientsVector.add(myHandler);
+                  player.setUserName((String) js.get("username"));
+                  player.setPassword((String) js.get("password"));
+                  player.setEmail((String) js.get("email"));
+                  player.setName((String) js.get("name"));
+                  player.setScore(0);
+                  if(DataAccessLayer.CheckUser(username)){
+                    resRegister = false;
+                  }
+                  else{
+                  DataAccessLayer.registerInsertMethod(player);
+                  Handler.clientsVector.add(myHandler);
+                  threadUserOnline.start();
+                  threadGame.start();
+                  }
+                 ps.println(String.valueOf(resRegister));
         } catch (JSONException ex) {
             Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return true;
+        return resRegister;
           }
      public String getUsername() {
         return username;
