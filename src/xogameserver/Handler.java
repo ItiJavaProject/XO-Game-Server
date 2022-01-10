@@ -143,7 +143,7 @@ public class Handler {
                     ArrayList<String> list = new ArrayList<String>();
                     json = new JSONObject();
                     for(Handler h:clientsVector){
-                        System.out.println(h.username+" VS "+h.opponent);
+                     
                        if (!(h.username.equals(username)) && h.opponent == null ){
                             list.add(h.username);
                         }
