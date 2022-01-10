@@ -18,9 +18,9 @@ import org.json.JSONObject;
 
 public class Handler {
 
-    private DataInputStream dis;
-    private PrintStream ps;
-    private Socket mySocket;
+    public DataInputStream dis;
+    public PrintStream ps;
+    public Socket mySocket;
     private String username;
     private String opponent;
     public static Vector<Handler> clientsVector = new Vector<Handler>();
@@ -44,7 +44,11 @@ public class Handler {
         }
         String res = null;
          boolean flag = false;
-
+  
+         
+         
+         
+         
 
         while (!flag) {
             try {
@@ -57,23 +61,6 @@ public class Handler {
                     flag = requestLogin(json);
                 }
 
-             /*else if(header.equals("register")){
-                  player.setUserName(username);
-                  player.setPassword((String) js.get("password"));
-                  player.setEmail((String) js.get("email"));
-                  player.setName((String) js.get("name"));
-                  player.setScore(0);
-                  if(DataAccessLayer.CheckUser(username)){
-                    ps.println("false");
-                  }
-                  else{
-                  DataAccessLayer.registerInsertMethod(player);
-                  Handler.clientsVector.add(myHandler);
-                    flag=true;
-                     ps.println("true");
-                  }
-                
-              }*/
 
             } catch (IOException ex) {
                 Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
@@ -81,7 +68,7 @@ public class Handler {
                 Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SQLException ex) {
                 Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
-            } 
+            }
         }
     }
      private boolean requestLogin(JSONObject js){
@@ -159,12 +146,12 @@ public class Handler {
                         System.out.println(h.username+" VS "+h.opponent);
                        if (!(h.username.equals(username)) && h.opponent == null ){
                             list.add(h.username);
-                        } 
-                        JSONArray jsonArr = new JSONArray(list);
+                        }
+                    }
+                     JSONArray jsonArr = new JSONArray(list);
                         json.put("header","getOnlineUsers");
                         json.put("listUsersOnline",jsonArr);
                         ps.println(json.toString());
-                    }
                     
                 } catch (JSONException ex) {
                     Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);

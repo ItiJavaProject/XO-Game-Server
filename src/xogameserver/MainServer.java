@@ -125,9 +125,9 @@ public class MainServer extends AnchorPane {
             //mySocket = new ServerSocket(7001);
             socket = new Socket();
             t.start();
+            t.suspend();
             onlineUserThread.start();
             onlineUserThread.suspend();
-            t.suspend();
             
             /*new Thread() {
                 public void run() {
@@ -167,6 +167,14 @@ public class MainServer extends AnchorPane {
                        mySocket.close();
                        onlineUserThread.suspend();
                        t.suspend();
+                       for(Handler h : Handler.clientsVector){
+                           h.threadGame.suspend();
+                           h.threadUserOnline.suspend();
+                           h.ps.close();
+                           h.dis.close();
+                           h.mySocket.close();
+                           Handler.clientsVector.remove(h);
+                       }
                        btnStart.setText("Start Services");
                    } catch (IOException ex) {
                        Logger.getLogger(MainServer.class.getName()).log(Level.SEVERE, null, ex);
