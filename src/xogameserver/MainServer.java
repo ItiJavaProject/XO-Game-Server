@@ -245,7 +245,7 @@ public class MainServer extends AnchorPane {
                 });
 
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(2000);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(MainServer.class.getName()).log(Level.SEVERE, null, ex);
                 }
