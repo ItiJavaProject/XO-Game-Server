@@ -1,7 +1,6 @@
 package xogameserver;
 
 import DataBase.DataAccessLayer;
-import java.awt.Panel;
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.ServerSocket;
@@ -15,13 +14,11 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
-import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
@@ -122,71 +119,33 @@ public class MainServer extends AnchorPane {
         getChildren().add(lbIp);
         getChildren().add(lbIpAdd);
 
-        /* new Thread(){
-            @Override
-            public void run() {
-                while(true){
-                    ObservableList<String> listUsersOnline = FXCollections.observableArrayList();
-                    for(Handler h:Handler.clientsVector){
-                        listUsersOnline.add(h.getUsername());
-                        
-                    }
-                    Platform.runLater(() -> {
-                          lstOnlineUsers.setItems(listUsersOnline);
-                    });
-                      
-                          
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(MainServer.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }   
-                }
-           
-        }.start();*/
-        //try {
-        //mySocket = new ServerSocket(7001);
+     
+        try {
+            mySocket = new ServerSocket(7001);
+        } catch (IOException ex) {
+            Logger.getLogger(MainServer.class.getName()).log(Level.SEVERE, null, ex);
+        }
         socket = new Socket();
         t.start();
         t.suspend();
         onlineUserThread.start();
         onlineUserThread.suspend();
 
-        /*new Thread() {
-                public void run() {
-                    while (true) {
-                        try {
-                            socket = mySocket.accept();
-                            new Handler(socket);
-                        } catch (IOException ex) {
-                            Logger.getLogger(MainServer.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    }
-                }
-            }.start();
-
-       /* } catch (IOException ex) {
-            Logger.getLogger(MainServer.class.getName()).log(Level.SEVERE, null, ex);
-        }*/
         btnStart.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 String txt = btnStart.getText();
                 if (txt.equals("Start Services")) {
-                    try {
-                        mySocket = new ServerSocket(7001);
+                  
                         socket = new Socket();
                         t.resume();
                         onlineUserThread.resume();
                         btnStart.setText("Stop Services");
                         Handler.clientsVector = new Vector<Handler>();
-                    } catch (IOException ex) {
-                        Logger.getLogger(MainServer.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                   
                 } else if (txt.equals("Stop Services")) {
                     try {
-                        mySocket.close();
+                        //mySocket.close();
                         onlineUserThread.suspend();
                         t.suspend();
                         for (Handler h : Handler.clientsVector) {
@@ -195,7 +154,7 @@ public class MainServer extends AnchorPane {
                             h.ps.close();
                             h.dis.close();
                             h.mySocket.close();
-                            Handler.clientsVector.remove(h);
+                          //  Handler.clientsVector.remove(h);
                         }
                         btnStart.setText("Start Services");
                     } catch (IOException ex) {
