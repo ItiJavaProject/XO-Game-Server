@@ -197,7 +197,6 @@ public class MainServer extends AnchorPane {
                 }
 
                 int off = count - Handler.clientsVector.size();
-
                 Platform.runLater(() -> {
                     lstOnlineUsers.setItems(listUsersOnline);
                     ObservableList<PieChart.Data> data = FXCollections.observableArrayList(new PieChart.Data("Online", Handler.clientsVector.size()), new PieChart.Data("Offline", off));

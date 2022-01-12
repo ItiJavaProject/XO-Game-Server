@@ -209,6 +209,12 @@ public class Handler {
                         for (Handler h : clientsVector) {
                             if ((h.username.equals(opponent))) {
                                 if (json.get("header").equals("move") && (json.getInt("row") == -1 || json.getString("move").equals("full") || json.getString("move").equals("win"))) {
+                                    if(json.getString("move").equals("win")){
+                                        DataAccessLayer.updateScore(username);
+                                    }
+                                    else if(json.getInt("row") == -1){
+                                      DataAccessLayer.updateScore(opponent);
+                                    }
                                     opponent = null;
                                     h.opponent = null;
                                 }
@@ -226,6 +232,8 @@ public class Handler {
                         Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex1);
                     }
                 } catch (JSONException ex) {
+                    Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SQLException ex) {
                     Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 try {
