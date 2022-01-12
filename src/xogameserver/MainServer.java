@@ -146,6 +146,7 @@ public class MainServer extends AnchorPane {
                 } else if (txt.equals("Stop Services")) {
                     try {
                         //mySocket.close();
+                       
                         onlineUserThread.suspend();
                         t.suspend();
                         for (Handler h : Handler.clientsVector) {
