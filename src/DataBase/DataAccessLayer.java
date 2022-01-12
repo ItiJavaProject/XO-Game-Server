@@ -64,15 +64,14 @@ public class DataAccessLayer {
     }
      
     public static void updateScore(String userName) throws SQLException {
-        PreparedStatement stmt1 = conection.prepareStatement("select SCORE from PLAYER where USERNAME = ?");
-        stmt1.setString(2, userName);
-        ResultSet rs = stmt1.executeQuery();
-        int score = rs.getInt("PASSWORD");
+        
+        int score = getscore(userName);
         PreparedStatement stmt = conection.prepareStatement(" UPDATE USERCONTACT  SET SCORE=? WHERE  USERNAME = ?");
         stmt.setInt(1, score + 1);
         stmt.setString(2, userName);
         stmt.executeUpdate();
     }
+    
    
    
      public static int  getCounte() throws SQLException {
@@ -86,5 +85,14 @@ public class DataAccessLayer {
         return counter;
        
     }
+     public static int  getscore(String userName) throws SQLException{
+     int score= 0;
+     PreparedStatement stmt1 = conection.prepareStatement("select SCORE from PLAYER where USERNAME = ?");
+        stmt1.setString(1, userName);
+        ResultSet rs = stmt1.executeQuery();
+         score = rs.getInt("SCORE");
+         return score;
+
+     }
     
 }
