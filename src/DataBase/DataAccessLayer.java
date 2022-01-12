@@ -21,7 +21,7 @@ public class DataAccessLayer {
    public static void connect() throws SQLException
    {        
            DriverManager.registerDriver (new ClientDriver());
-           conection=DriverManager.getConnection("jdbc:derby://localhost:1527/player","root","root");
+           conection=DriverManager.getConnection("jdbc:derby://localhost:1527/XOgame","root","root");
    }
    public static void registerInsertMethod(PlayerModel player) throws SQLException{
     PreparedStatement stmt = conection.prepareStatement("insert into PLAYER (USERNAME,NAME,EMAIL,PASSWORD,SCORE) Values(?,?,?,?,?)");
@@ -66,7 +66,7 @@ public class DataAccessLayer {
     public static void updateScore(String userName) throws SQLException {
         
         int score = getscore(userName);
-        PreparedStatement stmt = conection.prepareStatement(" UPDATE USERCONTACT  SET SCORE=? WHERE  USERNAME = ?");
+        PreparedStatement stmt = conection.prepareStatement(" UPDATE PLAYER SET SCORE=? WHERE  USERNAME = ?");
         stmt.setInt(1, score + 1);
         stmt.setString(2, userName);
         stmt.executeUpdate();

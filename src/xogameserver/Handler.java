@@ -219,6 +219,7 @@ public class Handler {
                                     h.opponent = null;
                                 }
                                 h.ps.println(json.toString());
+                                break;
                             }
                         }
                     }
