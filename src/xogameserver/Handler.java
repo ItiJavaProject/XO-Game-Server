@@ -23,7 +23,7 @@ public class Handler {
     public Socket mySocket;
     private String username;
     private String opponent;
-    public static Vector<Handler> clientsVector = new Vector<Handler>();
+    public static volatile Vector<Handler> clientsVector = new Vector<Handler>();
     private Handler myHandler;
     private JSONObject json;
     private PlayerModel player;
@@ -47,11 +47,9 @@ public class Handler {
             try {
                 res = dis.readLine();
                 json = new JSONObject(res);
-                System.out.println(res);
                 if (json.get("header").equals("register")) {
                     flag = requestRegister(json);
                 } else if (json.get("header").equals("login")) {
-                   
                     flag = requestLogin(json);
                 }
 
@@ -70,27 +68,27 @@ public class Handler {
         boolean resLogin = true;
 
         try {
+            username = (String) js.get("username");
             for (Handler h : clientsVector) {
                 if (h.username.equals(username)) {
                     notLogedBefore = false;
                 }
             }
+
             JSONObject json = new JSONObject();
-            username = (String) js.get("username");
+
             if (notLogedBefore && DataAccessLayer.UserLogin(username, (String) js.get("password"))) {
                 int score = DataAccessLayer.getscore(username);
                 json.put("header", "LoginRes");
                 json.put("res", "true");
                 json.put("score", score);
-                // ps.println(json);
-                //resLogin = true;
                 Handler.clientsVector.add(myHandler);
                 threadUserOnline.start();
                 threadGame.start();
             } else {
                 json.put("header", "LoginRes");
                 json.put("res", "false");
-                // resLogin = false;
+                resLogin = false;
 
             }
             ps.println(json.toString());
@@ -104,7 +102,11 @@ public class Handler {
     private boolean requestRegister(JSONObject js) throws SQLException {
         boolean resRegister = true;
          JSONObject json = new JSONObject();
-
+        try {
+            username = (String) js.get("username");
+        } catch (JSONException ex) {
+            Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
+        }
         try {
             player.setUserName((String) js.get("username"));
             player.setPassword((String) js.get("password"));

@@ -123,6 +123,8 @@ public class MainServer extends AnchorPane {
         try {
             mySocket = new ServerSocket(7001);
         } catch (IOException ex) {
+            System.out.println("Address already in use:  Server is on ");
+            System.exit(0);
             Logger.getLogger(MainServer.class.getName()).log(Level.SEVERE, null, ex);
         }
         socket = new Socket();
@@ -171,7 +173,6 @@ public class MainServer extends AnchorPane {
             while (true) {
                 try {
                     socket = mySocket.accept();
-                    System.out.println("new client");
                     new Handler(socket);
                 } catch (IOException ex) {
                     Logger.getLogger(MainServer.class.getName()).log(Level.SEVERE, null, ex);
