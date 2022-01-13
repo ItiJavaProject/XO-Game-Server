@@ -21,7 +21,7 @@ public class DataAccessLayer {
    public static void connect() throws SQLException
    {        
            DriverManager.registerDriver (new ClientDriver());
-           conection=DriverManager.getConnection("jdbc:derby://localhost:1527/player","root","root");
+           conection=DriverManager.getConnection("jdbc:derby://localhost:1527/XOgame","root","root");
    }
    public static void registerInsertMethod(PlayerModel player) throws SQLException{
     PreparedStatement stmt = conection.prepareStatement("insert into PLAYER (USERNAME,NAME,EMAIL,PASSWORD,SCORE) Values(?,?,?,?,?)");

@@ -171,6 +171,7 @@ public class MainServer extends AnchorPane {
             while (true) {
                 try {
                     socket = mySocket.accept();
+                    System.out.println("new client");
                     new Handler(socket);
                 } catch (IOException ex) {
                     Logger.getLogger(MainServer.class.getName()).log(Level.SEVERE, null, ex);

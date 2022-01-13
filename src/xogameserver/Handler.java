@@ -47,9 +47,11 @@ public class Handler {
             try {
                 res = dis.readLine();
                 json = new JSONObject(res);
+                System.out.println(res);
                 if (json.get("header").equals("register")) {
                     flag = requestRegister(json);
                 } else if (json.get("header").equals("login")) {
+                   
                     flag = requestLogin(json);
                 }
 
