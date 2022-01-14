@@ -75,10 +75,10 @@ public class MainServer extends AnchorPane {
 
         label.setAlignment(javafx.geometry.Pos.CENTER);
         label.setContentDisplay(javafx.scene.control.ContentDisplay.CENTER);
-        label.setLayoutX(389.0);
+        label.setLayoutX(500);
         label.setLayoutY(20.0);
         label.setPrefHeight(27.0);
-        label.setPrefWidth(215.0);
+        label.setPrefWidth(170);
         label.setText("Online Users");
 
         pie.setVisible(true);

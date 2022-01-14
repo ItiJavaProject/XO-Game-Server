@@ -54,11 +54,27 @@ public class Handler {
                 }
 
             } catch (IOException ex) {
-                Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
+                try {
+                        dis.close();
+                        ps.close();
+                        mySocket.close();
+                        clientsVector.remove(myHandler);
+                    } catch (IOException ex1) {
+                        Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex1);
+                    }
             } catch (JSONException ex) {
                 Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SQLException ex) {
                 Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
+            } catch(NullPointerException ex){
+                try {
+                        dis.close();
+                        ps.close();
+                        mySocket.close();
+                        clientsVector.remove(myHandler);
+                    } catch (IOException ex1) {
+                        Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex1);
+                    }
             }
         }
     }
@@ -176,6 +192,7 @@ public class Handler {
             }
         }
     };
+    
     Thread threadGame = new Thread() {
         @Override
         public void run() {
@@ -240,7 +257,17 @@ public class Handler {
                     Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (SQLException ex) {
                     Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
+                }catch (NullPointerException ex){
+                    try {
+                        dis.close();
+                        ps.close();
+                        mySocket.close();
+                        clientsVector.remove(myHandler);
+                    } catch (IOException ex1) {
+                        Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex1);
+                    }
                 }
+                
                 try {
                     sleep(500);
                 } catch (InterruptedException ex) {
