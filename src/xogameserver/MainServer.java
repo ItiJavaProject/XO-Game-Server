@@ -54,7 +54,7 @@ public class MainServer extends AnchorPane {
        
         Background bGround = new Background(bImg);
        
-        
+        getStylesheets().add("/Style/listViewStyle.css"); 
         
         lstOnlineUsers = new ListView();
         label = new Label();
